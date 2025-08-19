@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'eclipse-temurin:21-jdk'
+            image 'docker:24.0-dind'
             args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.kube:/root/.kube'
         }
     }
