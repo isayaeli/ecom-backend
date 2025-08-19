@@ -55,42 +55,34 @@
 
 
 pipeline {
-    agent none
+    agent any
 
     environment {
         APP_NAME     = "spring-app"
         DOCKER_IMAGE = "spring-app"
+        MAVEN_HOME   = "${WORKSPACE}/.m2"  // Use workspace instead of root
     }
 
     stages {
         stage('Checkout') {
-            agent any
             steps {
                 checkout scm
             }
         }
         
         stage('Build JAR') {
-            agent {
-                docker {
-                    image 'eclipse-temurin:21-jdk'
-                    args '-v $HOME/.m2:/root/.m2'
-                }
-            }
             steps {
                 sh '''
-                    ./mvnw clean package -DskipTests
+                    # Create Maven home in workspace (where we have write permissions)
+                    mkdir -p ${WORKSPACE}/.m2/repository
+                    
+                    # Build with Maven wrapper using local repository
+                    ./mvnw clean package -DskipTests -Dmaven.repo.local=${WORKSPACE}/.m2/repository
                 '''
             }
         }
 
         stage('Build Docker Image') {
-            agent {
-                docker {
-                    image 'docker:24.0'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.kube:/root/.kube'
-                }
-            }
             steps {
                 sh '''
                     docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
@@ -99,19 +91,15 @@ pipeline {
         }
 
         stage('Deploy to Minikube') {
-            agent {
-                docker {
-                    image 'bitnami/kubectl:latest'
-                    args '-v $HOME/.kube:/root/.kube'
-                }
-            }
             steps {
                 sh '''
-                    # Update deployment if exists, otherwise create it
-                    kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record || \
+                    # Use Minikube's Docker daemon if needed
+                    eval $(minikube docker-env 2>/dev/null) || true
+                    
+                    # Update deployment
+                    kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record || \\
                     kubectl apply -f k8s/deployment.yaml
                     
-                    # Wait until rollout finishes
                     kubectl rollout status deployment/$APP_NAME
                 '''
             }
