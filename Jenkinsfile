@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'eclipse-temurin:21-jdk'
+        }
+    }
 
     environment {
         APP_NAME     = "spring-app"
