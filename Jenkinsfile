@@ -61,6 +61,7 @@ pipeline {
         APP_NAME     = "spring-app"
         DOCKER_IMAGE = "spring-app"
         MAVEN_HOME   = "${WORKSPACE}/.m2"  // Use workspace instead of root
+        JAVA_HOME    = "/usr/lib/jvm/java-21-openjdk" 
     }
 
     stages {
