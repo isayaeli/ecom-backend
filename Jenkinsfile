@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'docker:24.0-dind'
+            image 'maven:3.9.6-eclipse-temurin-21-jdk'
             args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.kube:/root/.kube'
         }
     }
@@ -20,8 +20,6 @@ pipeline {
         stage('Build JAR') {
             steps {
                 sh '''
-                    export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-                    export PATH=$JAVA_HOME/bin:$PATH
                     export HOME=$WORKSPACE
                     export MAVEN_USER_HOME=$WORKSPACE/.m2
                     mkdir -p $MAVEN_USER_HOME
