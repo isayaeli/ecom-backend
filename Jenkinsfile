@@ -19,6 +19,7 @@ pipeline {
         stage('Build JAR') {
             steps {
                 sh '''
+                    export HOME=$WORKSPACE
                     export MAVEN_USER_HOME=$WORKSPACE/.m2
                     mkdir -p $MAVEN_USER_HOME
                     ./mvnw clean package -DskipTests
