@@ -32,7 +32,7 @@ pipeline {
             steps {
                 sh '''
                   # Use Minikube's Docker daemon
-                  eval $(minikube docker-env)
+                  #eval $(minikube docker-env)
                   docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
                 '''
             }
