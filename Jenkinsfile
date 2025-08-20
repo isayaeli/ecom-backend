@@ -161,14 +161,23 @@ pipeline {
             }
         }
 
+        // stage('Build Docker Image') {
+        //     steps {
+        //         sh '''
+        //             # Set Minikube Docker environment
+        //             #eval $(minikube docker-env)
+        //             docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
+        //             docker images | grep $DOCKER_IMAGE
+        //         '''
+        //     }
+        // }
+
         stage('Build Docker Image') {
             steps {
-                sh '''
-                    # Set Minikube Docker environment
-                    #eval $(minikube docker-env)
-                    docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
-                    docker images | grep $DOCKER_IMAGE
-                '''
+                script {
+                    // Use Jenkins Docker plugin to build image
+                    dockerImage = docker.build("${DOCKER_IMAGE}:${BUILD_NUMBER}")
+                }
             }
         }
         
