@@ -94,7 +94,8 @@ pipeline {
         stage('Deploy to Minikube') {
             steps {
                 sh '''
-                    export KUBECONFIG=/root/.kube/config
+                    export KUBECONFIG=$(minikube kubectl -- kubeconfig)
+                    kubectl config get-contexts
                     kubectl config use-context minikube
 
 
