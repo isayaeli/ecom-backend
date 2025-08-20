@@ -94,6 +94,10 @@ pipeline {
         stage('Deploy to Minikube') {
             steps {
                 sh '''
+                    export KUBECONFIG=/root/.kube/config
+                    kubectl config use-context minikube
+
+
                     # Use Minikube's Docker daemon if needed
                     eval $(minikube docker-env 2>/dev/null) || true
                     
