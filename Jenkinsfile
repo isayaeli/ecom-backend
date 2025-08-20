@@ -94,8 +94,7 @@ pipeline {
         stage('Deploy to Minikube') {
             steps {
                 sh '''
-                    export KUBECONFIG=/var/jenkins_home/.kube/config
-                    kubectl config get-contexts
+                    export KUBECONFIG=/root/.kube/config
                     kubectl config use-context minikube
 
 
