@@ -91,6 +91,29 @@ pipeline {
             }
         }
 
+        stage('Debug Kubernetes Setup') {
+    steps {
+        sh '''
+            echo "=== Debug Information ==="
+            echo "Current user: $(whoami)"
+            echo "Home directory: $HOME"
+            echo "KUBECONFIG: $KUBECONFIG"
+            echo ""
+            echo "=== Minikube Status ==="
+            minikube status || echo "Minikube not available"
+            echo ""
+            echo "=== Available Contexts ==="
+            kubectl config get-contexts
+            echo ""
+            echo "=== Current Context ==="
+            kubectl config current-context
+            echo ""
+            echo "=== Cluster Info ==="
+            kubectl cluster-info || echo "Cannot connect to cluster"
+        '''
+    }
+}
+
         stage('Deploy to Minikube') {
             steps {
                 sh '''
