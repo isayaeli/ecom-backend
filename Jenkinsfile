@@ -118,13 +118,7 @@
 
 
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.8.4-openjdk-17'  // Use Maven image with Java
-            args '-v /var/run/docker.sock:/var/run/docker.sock -v /usr/local/bin/docker:/usr/local/bin/docker'
-        }
-    }
-
+    agent any
 
     environment {
         APP_NAME     = "spring-app"
