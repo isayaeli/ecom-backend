@@ -210,9 +210,11 @@ pipeline {
     
     post {
         always {
-            sh '
+            sh '''
                 echo "Build completed with status: $currentBuild.result"
-            '
+                # Cleanup Minikube docker env to avoid conflicts
+                eval $(minikube docker-env -u) 2>/dev/null || true
+            '''
         }
     }
 }
