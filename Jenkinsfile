@@ -99,7 +99,7 @@ pipeline {
                     
                     # Update deployment
                     kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record || \\
-                    kubectl apply -f k8s/deployment.yaml
+                    kubectl apply -f deployment.yaml
                     
                     kubectl rollout status deployment/$APP_NAME
                 '''
