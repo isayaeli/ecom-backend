@@ -95,13 +95,10 @@ pipeline {
         stage('Deploy to Minikube') {
             steps {
                 sh '''
-
+                    export KUBECONFIG=/var/jenkins_home/.kube/config
+                    kubectl config use-context minikube
                     echo "Current kubectl context:"
                     kubectl config current-context
-                    
-                    # Just use whatever context is available
-                    CURRENT_CONTEXT=$(kubectl config current-context)
-                    echo "Using current context: $CURRENT_CONTEXT"
 
                     # Use Minikube's Docker daemon if needed
                     eval $(minikube docker-env 2>/dev/null) || true
