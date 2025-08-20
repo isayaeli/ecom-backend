@@ -149,7 +149,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Building Docker image inside Minikube..."
-                    eval $(minikube docker-env)  # Use Minikube's Docker daemon
+                  
                     docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
                 '''
             }
