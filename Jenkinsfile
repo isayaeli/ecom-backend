@@ -164,7 +164,7 @@ pipeline {
        
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .'
+                sh 'minikube image build -t spring-app:$BUILD_NUMBER .'
             }
         }
 
