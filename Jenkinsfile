@@ -213,10 +213,15 @@
 
 
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.9.6-eclipse-temurin-21'
+            args '-v /root/.m2:/root/.m2'  // optional: cache Maven dependencies
+        }
+    }
 
     environment {
-        DOCKER_IMAGE = "springboot-app"
+        DOCKER_IMAGE = "spring-app"
     }
 
     stages {
