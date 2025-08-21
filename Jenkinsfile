@@ -122,7 +122,7 @@ pipeline {
 
     environment {
         APP_NAME     = "spring-app"
-        DOCKER_IMAGE = "spring-app"
+        DOCKER_IMAGE = "spring-app1"
         MAVEN_HOME   = "${WORKSPACE}/.m2"
         // Use which java to dynamically find JAVA_HOME
         JAVA_HOME    = sh(script: 'dirname $(dirname $(readlink -f $(which java)))', returnStdout: true).trim()
@@ -162,14 +162,11 @@ pipeline {
         }
 
        
-        // stage('Build Docker Image') {
-        //     steps {
-        //         sh '''
-        //             docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
-        //             docker images | grep $DOCKER_IMAGE
-        //         '''
-        //     }
-        // }
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .'
+            }
+        }
 
     
         // stage('Deploy to Minikube') {
