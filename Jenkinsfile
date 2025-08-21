@@ -161,48 +161,51 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                sh '''
-                    docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
-                    docker images | grep $DOCKER_IMAGE
-                '''
-            }
-        }
+    //     stage('Build Docker Image') {
+    //         steps {
+    //             sh '''
+
+    //                 docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
+    //                 docker images | grep $DOCKER_IMAGE
+    //             '''
+    //         }
+    //     }
 
     
-        stage('Deploy to Minikube') {
-            steps {
-                sh '''
-                    export KUBECONFIG=/var/jenkins_home/.kube/config
-                    kubectl config use-context minikube
+    //     stage('Deploy to Minikube') {
+    //         steps {
+    //             sh '''
+    //                 export KUBECONFIG=/var/jenkins_home/.kube/config
+    //                 kubectl config use-context minikube
                     
-                    echo "Current kubectl context:"
-                    kubectl config current-context
-                    echo "Available deployments:"
-                    kubectl get deployments
+    //                 echo "Current kubectl context:"
+    //                 kubectl config current-context
+    //                 echo "Available deployments:"
+    //                 kubectl get deployments
 
-                    # Update or create deployment
-                    if kubectl get deployment $APP_NAME > /dev/null 2>&1; then
-                        echo "Updating existing deployment..."
-                        kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record
-                    else
-                        echo "Creating new deployment..."
-                        kubectl apply -f deployment.yaml --validate=false
-                    fi
+    //                 # Update or create deployment
+    //                 if kubectl get deployment $APP_NAME > /dev/null 2>&1; then
+    //                     echo "Updating existing deployment..."
+    //                     kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record
+    //                 else
+    //                     echo "Creating new deployment..."
+    //                     kubectl apply -f deployment.yaml --validate=false
+    //                 fi
                     
-                    kubectl rollout status deployment/$APP_NAME --timeout=300s
-                    kubectl get pods
-                '''
-            }
-        }
-    }
+    //                 kubectl rollout status deployment/$APP_NAME --timeout=300s
+    //                 kubectl get pods
+    //             '''
+    //         }
+    //     }
+    // }
     
-    post {
-        always {
-            sh '''
-                echo "Build completed with status: $currentBuild.result"
-            '''
-        }
-    }
+    // post {
+    //     always {
+    //         sh '''
+    //             echo "Build completed with status: $currentBuild.result"
+    //             # Cleanup Minikube docker env to avoid conflicts
+    //             eval $(minikube docker-env -u) 2>/dev/null || true
+    //         '''
+    //     }
+    // }
 }
