@@ -161,29 +161,15 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image in Minikube') {
+       
+        stage('Build Docker Image') {
             steps {
-                script {
-                    // Set Minikube Docker environment
-                    withEnv(["DOCKER_HOST=tcp://$(minikube ip):2376", "DOCKER_TLS_VERIFY=1"]) {
-                        sh """
-                            docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
-                            docker images | grep $DOCKER_IMAGE
-                        """
-                    }
-                }
+                sh '''
+                    docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
+                    docker images | grep $DOCKER_IMAGE
+                '''
             }
         }
-
-        // stage('Build Docker Image') {
-        //     steps {
-        //         sh '''
-
-        //             docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
-        //             docker images | grep $DOCKER_IMAGE
-        //         '''
-        //     }
-        // }
 
     
         // stage('Deploy to Minikube') {
