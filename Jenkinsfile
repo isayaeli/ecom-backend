@@ -162,14 +162,14 @@ pipeline {
         }
 
        
-        stage('Build Docker Image') {
-            steps {
-                sh '''
-                    docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
-                    docker images | grep $DOCKER_IMAGE
-                '''
-            }
-        }
+        // stage('Build Docker Image') {
+        //     steps {
+        //         sh '''
+        //             docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
+        //             docker images | grep $DOCKER_IMAGE
+        //         '''
+        //     }
+        // }
 
     
         // stage('Deploy to Minikube') {
