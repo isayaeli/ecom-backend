@@ -117,16 +117,106 @@
 
 
 
+// pipeline {
+//     agent any
+
+//     environment {
+//         APP_NAME     = "spring-app"
+//         DOCKER_IMAGE = "spring-app"
+//         MAVEN_HOME   = "${WORKSPACE}/.m2"
+//         // Use which java to dynamically find JAVA_HOME
+//         JAVA_HOME    = sh(script: 'dirname $(dirname $(readlink -f $(which java)))', returnStdout: true).trim()
+//         PATH         = "${JAVA_HOME}/bin:${PATH}"
+//     }
+
+//     stages {
+//         stage('Checkout') {
+//             steps {
+//                 checkout scm
+//             }
+//         }
+        
+//         stage('Setup Environment') {
+//             steps {
+//                 sh '''
+//                     # Verify Java installation
+//                     echo "JAVA_HOME: $JAVA_HOME"
+//                     echo "Java version:"
+//                     java -version
+//                     echo "Maven version:"
+//                     ./mvnw --version
+//                 '''
+//             }
+//         }
+        
+//         stage('Build JAR') {
+//             steps {
+//                 sh '''
+//                     # Create Maven home in workspace
+//                     mkdir -p ${WORKSPACE}/.m2/repository
+                    
+//                     # Build with Maven wrapper using local repository
+//                     ./mvnw clean package -DskipTests -Dmaven.repo.local=${WORKSPACE}/.m2/repository
+//                 '''
+//             }
+//         }
+
+//         stage('Build Docker Image') {
+//             steps {
+//                 sh '''
+//                     # Set Minikube Docker environment
+//                     #eval $(minikube docker-env)
+//                     docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
+//                     docker images | grep $DOCKER_IMAGE
+//                 '''
+//             }
+//         }
+
+    
+//         stage('Deploy to Minikube') {
+//             steps {
+//                 sh '''
+//                     export KUBECONFIG=/var/jenkins_home/.kube/config
+//                     kubectl config use-context minikube
+                    
+//                     echo "Current kubectl context:"
+//                     kubectl config current-context
+//                     echo "Available deployments:"
+//                     kubectl get deployments
+
+//                     # Update or create deployment
+//                     if kubectl get deployment $APP_NAME > /dev/null 2>&1; then
+//                         echo "Updating existing deployment..."
+//                         kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record
+//                     else
+//                         echo "Creating new deployment..."
+//                         kubectl apply -f deployment.yaml --validate=false
+//                     fi
+                    
+//                     kubectl rollout status deployment/$APP_NAME --timeout=300s
+//                     kubectl get pods
+//                 '''
+//             }
+//         }
+//     }
+    
+//     post {
+//         always {
+//             sh '''
+//                 echo "Build completed with status: $currentBuild.result"
+//                 # Cleanup Minikube docker env to avoid conflicts
+//                 eval $(minikube docker-env -u) 2>/dev/null || true
+//             '''
+//         }
+//     }
+// }
+
+
 pipeline {
     agent any
 
     environment {
-        APP_NAME     = "spring-app"
-        DOCKER_IMAGE = "spring-app"
-        MAVEN_HOME   = "${WORKSPACE}/.m2"
-        // Use which java to dynamically find JAVA_HOME
-        JAVA_HOME    = sh(script: 'dirname $(dirname $(readlink -f $(which java)))', returnStdout: true).trim()
-        PATH         = "${JAVA_HOME}/bin:${PATH}"
+        DOCKER_IMAGE = "springboot-app"
     }
 
     stages {
@@ -135,78 +225,33 @@ pipeline {
                 checkout scm
             }
         }
-        
-        stage('Setup Environment') {
+
+        stage('Build Jar') {
             steps {
-                sh '''
-                    # Verify Java installation
-                    echo "JAVA_HOME: $JAVA_HOME"
-                    echo "Java version:"
-                    java -version
-                    echo "Maven version:"
-                    ./mvnw --version
-                '''
-            }
-        }
-        
-        stage('Build JAR') {
-            steps {
-                sh '''
-                    # Create Maven home in workspace
-                    mkdir -p ${WORKSPACE}/.m2/repository
-                    
-                    # Build with Maven wrapper using local repository
-                    ./mvnw clean package -DskipTests -Dmaven.repo.local=${WORKSPACE}/.m2/repository
-                '''
+                sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Docker Image (Minikube)') {
             steps {
-                sh '''
-                    # Set Minikube Docker environment
-                    #eval $(minikube docker-env)
+                script {
+                    sh """
+                    eval \$(minikube docker-env)
                     docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
-                    docker images | grep $DOCKER_IMAGE
-                '''
+                    """
+                }
             }
         }
 
-    
-        stage('Deploy to Minikube') {
+        stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                    export KUBECONFIG=/var/jenkins_home/.kube/config
-                    kubectl config use-context minikube
-                    
-                    echo "Current kubectl context:"
-                    kubectl config current-context
-                    echo "Available deployments:"
-                    kubectl get deployments
-
-                    # Update or create deployment
-                    if kubectl get deployment $APP_NAME > /dev/null 2>&1; then
-                        echo "Updating existing deployment..."
-                        kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record
-                    else
-                        echo "Creating new deployment..."
-                        kubectl apply -f deployment.yaml --validate=false
-                    fi
-                    
-                    kubectl rollout status deployment/$APP_NAME --timeout=300s
-                    kubectl get pods
-                '''
+                script {
+                    sh """
+                    sed -i 's|image:.*|image: $DOCKER_IMAGE:$BUILD_NUMBER|g' k8s/deployment.yaml
+                    kubectl apply -f k8s/deployment.yaml
+                    """
+                }
             }
-        }
-    }
-    
-    post {
-        always {
-            sh '''
-                echo "Build completed with status: $currentBuild.result"
-                # Cleanup Minikube docker env to avoid conflicts
-                eval $(minikube docker-env -u) 2>/dev/null || true
-            '''
         }
     }
 }
