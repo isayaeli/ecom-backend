@@ -213,15 +213,15 @@
 
 
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.6-eclipse-temurin-21'
-            args '-v /root/.m2:/root/.m2'  // optional: cache Maven dependencies
-        }
-    }
+    agent any
 
     environment {
+        APP_NAME     = "spring-app"
         DOCKER_IMAGE = "spring-app"
+        MAVEN_HOME   = "${WORKSPACE}/.m2"
+        // Use which java to dynamically find JAVA_HOME
+        JAVA_HOME    = sh(script: 'dirname $(dirname $(readlink -f $(which java)))', returnStdout: true).trim()
+        PATH         = "${JAVA_HOME}/bin:${PATH}"
     }
 
     stages {
