@@ -187,6 +187,30 @@ pipeline {
             }
         }
 
+        stage('Install minkube') {
+            steps {
+                sh '''
+                    # Check what's available
+                    echo "Available tools:"
+                    which docker || echo "Docker not found"
+                    which kubectl || echo "kubectl not found"
+                    which minikube || echo "minikube not found"
+                    
+                    # Install minikube if missing
+                    if ! command -v minikube &> /dev/null; then
+                        echo "Installing minikube..."
+                        curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+                        sudo install minikube-linux-amd64 /usr/local/bin/minikube
+                        rm minikube-linux-amd64
+                    fi
+                    
+                    # Verify installation
+                    minikube version
+                '''
+            }
+        }
+        
+
         stage('Deploy') {
             steps {
                 script {
