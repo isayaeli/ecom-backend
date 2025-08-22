@@ -1,7 +1,7 @@
 
 pipeline {
     agent {
-        docker {
+        dockerContainer {
             image 'lachlanevenson/k8s-kubectl:v1.30.0'
         }
     }
