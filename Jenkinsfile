@@ -57,16 +57,17 @@ pipeline {
         }
 
 
-        stage('Setup Kubeconfig') {
+        stage('Install Minikube CLI'){
             steps {
                 sh '''
-                mkdir -p $HOME/.kube
-                cp /var/jenkins_home/.kube/config $HOME/.kube/config
-                kubectl config use-context minikube
+                curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+                chmod +x minikube-linux-amd64
+                mv minikube-linux-amd64 /var/jenkins_home/bin/minikube
+                export PATH=/var/jenkins_home/bin:$PATH
+                minikube version
                 '''
             }
         }
-
 
 
 
