@@ -44,24 +44,17 @@ pipeline {
         }
 
        
-        stage('Deploy Existing Image') {
+     stage('Deploy') {
             steps {
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
                 sh '''
-                    export KUBECONFIG="$KUBECONFIG_FILE"
-                    kubectl config use-context minikube
-
-                    # Load the prebuilt local image into minikube
-                    minikube image load spring-app:latest
-
-                    # Deploy using local image (with imagePullPolicy: IfNotPresent)
-                    kubectl -n demo apply -f deployment.yaml
-                   
-                    kubectl -n demo rollout status deploy/spring-app
+                kubectl config use-context minikube
+                minikube image load spring-app:latest
+                kubectl -n demo apply -f k8s/deployment.yaml
+                kubectl -n demo apply -f k8s/service.yaml
                 '''
-                }
             }
-            }
+        }
+
 
 
     
