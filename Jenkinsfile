@@ -200,7 +200,7 @@ pipeline {
                     if ! command -v minikube &> /dev/null; then
                         echo "Installing minikube..."
                         curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-                        sudo install minikube-linux-amd64 /usr/local/bin/minikube
+                        install minikube-linux-amd64 /usr/local/bin/minikube
                         rm minikube-linux-amd64
                     fi
                     
