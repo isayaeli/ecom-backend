@@ -221,7 +221,7 @@ pipeline {
                             minikube kubectl -- get pods
                         '''
                    
-                
+                }  
             }
         
         // stage('Deploy to Minikube') {
