@@ -166,7 +166,7 @@ pipeline {
             steps {
                 sh '''
                     # Set Minikube Docker environment
-                    
+                    eval $(minikube docker-env)
                     docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
                     docker images | grep $DOCKER_IMAGE
                 '''
@@ -214,21 +214,14 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    if (env.USE_MINIKUBE_DIRECT == "true") {
-                        // Simple approach for local development
+                    
                         sh '''
                             minikube kubectl -- apply -f deployment.yaml
                             minikube kubectl -- rollout status deployment/$APP_NAME --timeout=300s
                             minikube kubectl -- get pods
                         '''
-                    } else {
-                        // Traditional approach for production
-                        sh '''
-                            kubectl apply -f deployment.yaml
-                            kubectl rollout status deployment/$APP_NAME --timeout=300s
-                        '''
-                    }
-                }
+                   
+                
             }
         
         // stage('Deploy to Minikube') {
