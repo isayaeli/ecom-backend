@@ -1,10 +1,6 @@
 
 pipeline {
-    agent {
-        dockerContainer {
-            image 'lachlanevenson/k8s-kubectl:v1.30.0'
-        }
-    }
+    agent any
 
     environment {
         APP_NAME     = "spring-app"
@@ -53,12 +49,39 @@ pipeline {
                 sh '''
                 kubectl config use-context minikube
                 minikube image load spring-app:latest
-                kubectl -n demo apply -f k8s/deployment.yaml
-                kubectl -n demo apply -f k8s/service.yaml
+                kubectl -n demo apply -f deployment.yaml
                 '''
             }
         }
 
+
+
+    
+        // stage('Deploy to Minikube') {
+        //     steps {
+        //         sh '''
+        //             export KUBECONFIG=/var/jenkins_home/.kube/config
+        //             kubectl config use-context minikube
+                    
+        //             echo "Current kubectl context:"
+        //             kubectl config current-context
+        //             echo "Available deployments:"
+        //             kubectl get deployments
+
+        //             # Update or create deployment
+        //             if kubectl get deployment $APP_NAME > /dev/null 2>&1; then
+        //                 echo "Updating existing deployment..."
+        //                 kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record
+        //             else
+        //                 echo "Creating new deployment..."
+        //                 kubectl apply -f deployment.yaml --validate=false
+        //             fi
+                    
+        //             kubectl rollout status deployment/$APP_NAME --timeout=300s
+        //             kubectl get pods
+        //         '''
+        //     }
+        // }
     }
     
     // post {
