@@ -12,6 +12,15 @@ pipeline {
     }
 
     stages {
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                container('bitnami/kubectl:latest') {
+                    sh 'kubectl get pods -n default'
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 checkout scm
