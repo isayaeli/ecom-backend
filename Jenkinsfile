@@ -127,6 +127,7 @@ pipeline {
         // Use which java to dynamically find JAVA_HOME
         JAVA_HOME    = sh(script: 'dirname $(dirname $(readlink -f $(which java)))', returnStdout: true).trim()
         PATH         = "${JAVA_HOME}/bin:${PATH}"
+        USE_MINIKUBE_DIRECT = "true"
     }
 
     stages {
@@ -185,32 +186,52 @@ pipeline {
                 '''
             }
         }
-        
-        stage('Deploy to Minikube') {
-            steps {
-                sh '''
-                    export KUBECONFIG=/var/jenkins_home/.kube/config
-                    kubectl config use-context minikube
-                    
-                    echo "Current kubectl context:"
-                    kubectl config current-context
-                    echo "Available deployments:"
-                    kubectl get deployments
 
-                    # Update or create deployment
-                    if kubectl get deployment $APP_NAME > /dev/null 2>&1; then
-                        echo "Updating existing deployment..."
-                        kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record
-                    else
-                        echo "Creating new deployment..."
-                        kubectl apply -f deployment.yaml --validate=false
-                    fi
-                    
-                    kubectl rollout status deployment/$APP_NAME --timeout=300s
-                    kubectl get pods
-                '''
+        stage('Deploy') {
+            steps {
+                script {
+                    if (env.USE_MINIKUBE_DIRECT == "true") {
+                        // Simple approach for local development
+                        sh '''
+                            minikube kubectl -- apply -f kubernetes/
+                            minikube kubectl -- rollout status deployment/springboot-app
+                            minikube kubectl -- get pods
+                        '''
+                    } else {
+                        // Traditional approach for production
+                        sh '''
+                            kubectl apply -f kubernetes/
+                            kubectl rollout status deployment/springboot-app
+                        '''
+                    }
+                }
             }
-        }
+        
+        // stage('Deploy to Minikube') {
+        //     steps {
+        //         sh '''
+        //             export KUBECONFIG=/var/jenkins_home/.kube/config
+        //             kubectl config use-context minikube
+                    
+        //             echo "Current kubectl context:"
+        //             kubectl config current-context
+        //             echo "Available deployments:"
+        //             kubectl get deployments
+
+        //             # Update or create deployment
+        //             if kubectl get deployment $APP_NAME > /dev/null 2>&1; then
+        //                 echo "Updating existing deployment..."
+        //                 kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record
+        //             else
+        //                 echo "Creating new deployment..."
+        //                 kubectl apply -f deployment.yaml --validate=false
+        //             fi
+                    
+        //             kubectl rollout status deployment/$APP_NAME --timeout=300s
+        //             kubectl get pods
+        //         '''
+        //     }
+        // }
     }
     
     post {
