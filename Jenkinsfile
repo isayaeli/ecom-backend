@@ -1,11 +1,10 @@
 
 pipeline {
     agent {
-        dockerContainer {
-        image 'lachlanevenson/k8s-kubectl:v1.30.0'
-        args '-v /root/.kube:/root/.kube'
+        docker {
+            image 'lachlanevenson/k8s-kubectl:v1.30.0'
         }
-  }
+    }
 
     environment {
         APP_NAME     = "spring-app"
