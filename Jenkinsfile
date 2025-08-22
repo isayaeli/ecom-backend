@@ -12,9 +12,6 @@ pipeline {
     }
 
     stages {
-
-       
-
         stage('Checkout') {
             steps {
                 checkout scm
@@ -46,25 +43,26 @@ pipeline {
             }
         }
 
-    
-     stage('Deploy to Kubernetes') {
-            steps {
-                container('bitnami/kubectl:latest') {
-                    sh 'kubectl get pods -n default'
+        stage('Install Kubectl'){
+                steps {
+                    sh '''
+                    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                            chmod +x kubectl
+                            mv kubectl /usr/local/bin/kubectl
+                    '''
                 }
             }
-        }
 
-       
-     stage('Deploy') {
-            steps {
-                sh '''
-                kubectl config use-context minikube
-                minikube image load spring-app:latest
-                kubectl -n demo apply -f deployment.yaml
-                '''
+        
+        stage('Deploy') {
+                steps {
+                    sh '''
+                    kubectl config use-context minikube
+                    minikube image load spring-app:latest
+                    kubectl -n demo apply -f deployment.yaml
+                    '''
+                }
             }
-        }
 
 
 
