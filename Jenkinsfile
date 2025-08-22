@@ -60,34 +60,6 @@ pipeline {
             }
         }
 
-
-
-    
-        // stage('Deploy to Minikube') {
-        //     steps {
-        //         sh '''
-        //             export KUBECONFIG=/var/jenkins_home/.kube/config
-        //             kubectl config use-context minikube
-                    
-        //             echo "Current kubectl context:"
-        //             kubectl config current-context
-        //             echo "Available deployments:"
-        //             kubectl get deployments
-
-        //             # Update or create deployment
-        //             if kubectl get deployment $APP_NAME > /dev/null 2>&1; then
-        //                 echo "Updating existing deployment..."
-        //                 kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record
-        //             else
-        //                 echo "Creating new deployment..."
-        //                 kubectl apply -f deployment.yaml --validate=false
-        //             fi
-                    
-        //             kubectl rollout status deployment/$APP_NAME --timeout=300s
-        //             kubectl get pods
-        //         '''
-        //     }
-        // }
     }
     
     // post {
