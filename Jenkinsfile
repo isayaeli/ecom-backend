@@ -185,6 +185,22 @@ pipeline {
                 '''
             }
         }
+
+        stage('Setup Kubernetes Access') {
+            steps {
+                sh '''
+                    # Create .kube directory
+                    mkdir -p /var/jenkins_home/.kube
+                    
+                    # Generate minikube config directly
+                    minikube kubectl -- config view --minify > /var/jenkins_home/.kube/config
+                    
+                    # Verify the config was created
+                    ls -la /var/jenkins_home/.kube/
+                    cat /var/jenkins_home/.kube/config
+                '''
+            }
+        }
         
         // stage('Deploy to Minikube') {
         //     steps {
