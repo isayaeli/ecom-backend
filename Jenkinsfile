@@ -13,13 +13,7 @@ pipeline {
 
     stages {
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                container('bitnami/kubectl:latest') {
-                    sh 'kubectl get pods -n default'
-                }
-            }
-        }
+       
 
         stage('Checkout') {
             steps {
@@ -49,6 +43,15 @@ pipeline {
                     # Build with Maven wrapper using local repository
                     ./mvnw clean package -DskipTests -Dmaven.repo.local=${WORKSPACE}/.m2/repository
                 '''
+            }
+        }
+
+    
+     stage('Deploy to Kubernetes') {
+            steps {
+                container('bitnami/kubectl:latest') {
+                    sh 'kubectl get pods -n default'
+                }
             }
         }
 
