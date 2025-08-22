@@ -214,9 +214,9 @@ pipeline {
                 script {
                     
                         sh '''
-                            minikube kubectl -- apply -f deployment.yaml
-                            minikube kubectl -- rollout status deployment/$APP_NAME --timeout=300s
-                            minikube kubectl -- get pods
+                            kubectl -- apply -f deployment.yaml
+                            kubectl -- rollout status deployment/$APP_NAME --timeout=300s
+                            kubectl -- get pods
                         '''
                    
                 }  
