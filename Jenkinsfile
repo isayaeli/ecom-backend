@@ -193,15 +193,15 @@ pipeline {
                     if (env.USE_MINIKUBE_DIRECT == "true") {
                         // Simple approach for local development
                         sh '''
-                            minikube kubectl -- apply -f kubernetes/
-                            minikube kubectl -- rollout status deployment/springboot-app
+                            minikube kubectl -- apply -f deployment.yaml
+                            minikube kubectl -- rollout status deployment/$APP_NAME --timeout=300s
                             minikube kubectl -- get pods
                         '''
                     } else {
                         // Traditional approach for production
                         sh '''
-                            kubectl apply -f kubernetes/
-                            kubectl rollout status deployment/springboot-app
+                            kubectl apply -f deployment.yaml
+                            kubectl rollout status deployment/$APP_NAME --timeout=300s
                         '''
                     }
                 }
