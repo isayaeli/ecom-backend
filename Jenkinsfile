@@ -185,60 +185,29 @@ pipeline {
                 '''
             }
         }
-
-        stage('Setup Kubernetes Access') {
-            steps {
-                sh '''
-                    # Create .kube directory
-                    mkdir -p /var/jenkins_home/.kube
-                    
-                    # Generate minikube config directly
-                    minikube kubectl -- config view --minify > /var/jenkins_home/.kube/config
-                    
-                    # Verify the config was created
-                    ls -la /var/jenkins_home/.kube/
-                    cat /var/jenkins_home/.kube/config
-                '''
-            }
-        }
         
-        // stage('Deploy to Minikube') {
-        //     steps {
-        //         sh '''
-        //             export KUBECONFIG=/var/jenkins_home/.kube/config
-        //             kubectl config use-context minikube
-                    
-        //             echo "Current kubectl context:"
-        //             kubectl config current-context
-        //             echo "Available deployments:"
-        //             kubectl get deployments
-
-        //             # Update or create deployment
-        //             if kubectl get deployment $APP_NAME > /dev/null 2>&1; then
-        //                 echo "Updating existing deployment..."
-        //                 kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record
-        //             else
-        //                 echo "Creating new deployment..."
-        //                 kubectl apply -f deployment.yaml --validate=false
-        //             fi
-                    
-        //             kubectl rollout status deployment/$APP_NAME --timeout=300s
-        //             kubectl get pods
-        //         '''
-        //     }
-        // }
-
-
-        stage('Deploy') {
+        stage('Deploy to Minikube') {
             steps {
                 sh '''
-                    # Copy kubeconfig from host if needed
-                    mkdir -p /var/jenkins_home/.kube
-                    cp /home/youruser/.kube/config /var/jenkins_home/.kube/config
-                    
-                    # Now kubectl should work
-                    kubectl get nodes
+                    export KUBECONFIG=/var/jenkins_home/.kube/config
                     kubectl config use-context minikube
+                    
+                    echo "Current kubectl context:"
+                    kubectl config current-context
+                    echo "Available deployments:"
+                    kubectl get deployments
+
+                    # Update or create deployment
+                    if kubectl get deployment $APP_NAME > /dev/null 2>&1; then
+                        echo "Updating existing deployment..."
+                        kubectl set image deployment/$APP_NAME $APP_NAME=$DOCKER_IMAGE:$BUILD_NUMBER --record
+                    else
+                        echo "Creating new deployment..."
+                        kubectl apply -f deployment.yaml --validate=false
+                    fi
+                    
+                    kubectl rollout status deployment/$APP_NAME --timeout=300s
+                    kubectl get pods
                 '''
             }
         }
