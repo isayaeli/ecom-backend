@@ -231,7 +231,7 @@ pipeline {
         //             kubectl get pods
         //         '''
         //     }
-        // }
+        }
     }
     
     post {
