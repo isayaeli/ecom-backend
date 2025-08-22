@@ -1,6 +1,11 @@
 
 pipeline {
-    agent any
+    agent {
+        docker {
+        image 'lachlanevenson/k8s-kubectl:v1.30.0'  // contains kubectl
+        args '-v /root/.kube:/root/.kube'           // mount kube config if needed
+        }
+    }
 
     environment {
         APP_NAME     = "spring-app"
