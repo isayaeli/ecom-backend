@@ -165,8 +165,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                    # Set Minikube Docker environment
-                    eval $(minikube docker-env)
                     docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .
                     docker images | grep $DOCKER_IMAGE
                 '''
