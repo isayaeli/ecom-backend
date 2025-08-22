@@ -57,6 +57,18 @@ pipeline {
         }
 
 
+        stage('Setup Kubeconfig') {
+            steps {
+                sh '''
+                mkdir -p $HOME/.kube
+                cp /var/jenkins_home/.kube/config $HOME/.kube/config
+                kubectl config use-context minikube
+                '''
+            }
+        }
+
+
+
 
         
             stage('Deploy') {
