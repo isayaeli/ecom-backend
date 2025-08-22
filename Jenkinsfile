@@ -60,14 +60,15 @@ pipeline {
 
         
         stage('Deploy') {
-                steps {
-                    sh '''
-                    kubectl config use-context minikube
-                    minikube image load spring-app:latest
-                    kubectl -n demo apply -f deployment.yaml
-                    '''
-                }
-            }
+    steps {
+        sh '''
+        /var/jenkins_home/bin/kubectl config use-context minikube
+        minikube image load spring-app:latest
+        /var/jenkins_home/bin/kubectl -n demo apply -f deployment.yaml
+        '''
+    }
+}
+
 
 
 
