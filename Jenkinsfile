@@ -46,14 +46,16 @@ pipeline {
         stage('Install Kubectl'){
             steps {
                 sh '''
+                mkdir -p /var/jenkins_home/bin
                 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
                 chmod +x kubectl
-                mv kubectl $HOME/bin/kubectl
-                export PATH=$HOME/bin:$PATH
+                mv kubectl /var/jenkins_home/bin/kubectl
+                export PATH=/var/jenkins_home/bin:$PATH
                 kubectl version --client
                 '''
             }
         }
+
 
 
         
