@@ -4,9 +4,6 @@ pipeline {
     environment {
         APP_NAME     = "spring-app"
         DOCKER_IMAGE = "spring-app"
-        // MAVEN_HOME   = "${WORKSPACE}/.m2"
-        // JAVA_HOME    = sh(script: 'dirname $(dirname $(readlink -f $(which java)))', returnStdout: true).trim()
-        // PATH         = "${JAVA_HOME}/bin:${PATH}"
         USE_MINIKUBE_DIRECT = "true"
     }
 
